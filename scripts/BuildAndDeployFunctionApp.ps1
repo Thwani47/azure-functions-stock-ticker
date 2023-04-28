@@ -1,6 +1,4 @@
-$resourceGroup = "azure-functions-stock-ticker-rg";
-$functionAppName = "afstfunctionapp"
-
+. .\Variables.ps1
 
 if (!(Test-Path ".\deploy")) {
     New-Item -ItemType Directory -Path .\deploy

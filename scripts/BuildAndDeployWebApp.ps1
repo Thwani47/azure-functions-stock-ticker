@@ -1,5 +1,4 @@
-$resourceGroup = "azure-functions-stock-ticker-rg";
-$appName = "azure-functions-stock-ticker-webapp";
+. .\Variables.ps1
 
 if (!(Test-Path ".\deploy")){
     New-Item -ItemType Directory -Path .\deploy
@@ -15,10 +14,10 @@ npm i
 npm run build
 
 # Create build artifacts archive
-Compress-Archive -Path .\dist\* -DestinationPath ..\..\deploy\$appName.zip -Force
+Compress-Archive -Path .\dist\* -DestinationPath ..\..\deploy\$appService.zip -Force
 
 # CD to root directory
 Set-Location $currentLocation
 
 # Deploy
-az webapp deploy --resource-group $resourceGroup --name $appName --src-path .\deploy\$appName.zip --type zip --async true
+az webapp deploy --resource-group $resourceGroup --name $appService --src-path .\deploy\$appService.zip --type zip --async true
