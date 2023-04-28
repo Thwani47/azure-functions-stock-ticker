@@ -13,3 +13,16 @@ az storage account create --name $storageAccountName --location $location --reso
 az functionapp create --resource-group $resourceGroup  --consumption-plan-location $location  --runtime dotnet --functions-version 4 --name $functionAppName --storage-account $storageAccountName
 $apiKey = Read-Host -Prompt "Enter your Finnhub API Key: "
 az functionapp config appsettings set --name $functionAppName --resource-group $resourceGroup --settings APIKey=$apiKey
+
+# create azure cosmos db account
+az cosmosdb create --name $azureCosmosAccountName --resource-group $resourceGroup --backup-redundancy Local
+
+# create azure cosmos database
+az cosmosdb database create --db-name $azureCosmosDatabase --name $azureCosmosAccountName --resource-group $resourceGroup
+
+# create azure cosmos database container
+az cosmosdb collection create --collection-name $container --db-name $azureCosmosDatabase --name $azureCosmosAccountName --resource-group $resourceGroup --partition-key-path partitionKey
+
+$cosmosDbConnectionString = az cosmosdb keys list --name $azureCosmosAccountName --resource-group $resourceGroup --type connection-strings --query 'connectionStrings[0].connectionString' -o tsv
+az cosmosdb  database create --account-name $azureCosmosAccountName --resource-group $resourceGroup --name $azureCosmosDatabase
+az functionapp config appsettings set --name $functionAppName --resource-group $resourceGroup --settings CosmosDbConnectionString=$cosmosDbConnectionString
