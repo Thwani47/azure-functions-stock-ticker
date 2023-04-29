@@ -17,6 +17,18 @@ az functionapp config appsettings set --name $functionAppName --resource-group $
 # create azure cosmos db account
 az cosmosdb create --name $azureCosmosAccountName --locations regionName=$location --resource-group $resourceGroup --kind MongoDB
 
+# create azure cosmos database
+az cosmosdb database create --name $azureCosmosAccountName --db-name $azureCosmosDatabase --resource-group $resourceGroup
+
+# create azure cosmos db container
+az cosmosdb collection create --name $azureCosmosAccountName --db-name $azureCosmosDatabase --collection-name $collectionName --partition-key-path '/id'  --resource-group $resourceGroup
+
 # Get Azure Account connection String
 $cosmosDbConnectionString = az cosmosdb keys list --name $azureCosmosAccountName --resource-group $resourceGroup --type connection-strings --query 'connectionStrings[0].connectionString' -o tsv
 az functionapp config appsettings set --name $functionAppName --resource-group $resourceGroup --settings CosmosDbConnectionString=$cosmosDbConnectionString
+
+# create signalr service
+az signalr create --name $signalRSvc --resource-group $resourceGroup --sku "Free_F1" --unit-count 1 --service-mode "Default"
+
+$signalRSvcConnstring=$(az signalr key list --name $signalRSvc  --resource-group $resourceGroup --query primaryConnectionString -o tsv)
+az functionapp config appsettings set --name $functionAppName --resource-group $resourceGroup --settings AzureSignalRConnectionString=$signalRSvcConnstring

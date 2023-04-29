@@ -12,10 +12,10 @@ namespace StockTickerFunc
     public class StockPriceTrackerFunc
     {
         [FunctionName("StockPriceTrackerFunc")]
-        public async Task Run([TimerTrigger("* * * * *")] TimerInfo myTimer, [CosmosDB(
-        databaseName: "stock-ticker",
-        containerName: "stockprices",
-        Connection = "CosmosDbConnectionString")]IAsyncCollector<dynamic> documentsOut, ILogger log, ExecutionContext context)
+        public async Task Run([TimerTrigger("0 * * * * *")] TimerInfo myTimer, [CosmosDB(
+        databaseName :  "stock-ticker",
+        collectionName: "stockprices",
+        ConnectionStringSetting = "CosmosDbConnectionString")]IAsyncCollector<dynamic> documentsOut, ILogger log, ExecutionContext context)
         {
             var ts = DateTime.Now;
             var previousQuote = new Quote
@@ -40,11 +40,11 @@ namespace StockTickerFunc
                 if (quote.CurrentPrice != previousQuote.CurrentPrice)
                 {
                     log.LogInformation($"{quote.CurrentPrice} {previousQuote.CurrentPrice}");
-                    await documentsOut.AddAsync(new 
+                    await documentsOut.AddAsync(new
                     {
-                         id = Guid.NewGuid().ToString(),
-                         timestamp = ts.ToString(),
-                         quote = JsonConvert.SerializeObject(quote)
+                        id = Guid.NewGuid().ToString(),
+                        timestamp = ts.ToString(),
+                        quote = JsonConvert.SerializeObject(quote)
                     });
                 }
 
