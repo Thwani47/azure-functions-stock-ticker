@@ -12,8 +12,12 @@ namespace StockTickerFunc
     public class StockPriceTrackerFunc
     {
         [FunctionName("StockPriceTrackerFunc")]
-        public async Task Run([TimerTrigger("* * * * *")] TimerInfo myTimer, ILogger log, ExecutionContext context)
+        public async Task Run([TimerTrigger("* * * * *")] TimerInfo myTimer, [CosmosDB(
+        databaseName: "stock-ticker",
+        containerName: "stockprices",
+        Connection = "CosmosDbConnectionString")]IAsyncCollector<dynamic> documentsOut, ILogger log, ExecutionContext context)
         {
+            var ts = DateTime.Now;
             var previousQuote = new Quote
             {
                 CurrentPrice = Double.MinValue
@@ -36,12 +40,17 @@ namespace StockTickerFunc
                 if (quote.CurrentPrice != previousQuote.CurrentPrice)
                 {
                     log.LogInformation($"{quote.CurrentPrice} {previousQuote.CurrentPrice}");
+                    await documentsOut.AddAsync(new 
+                    {
+                         id = Guid.NewGuid().ToString(),
+                         timestamp = ts.ToString(),
+                         quote = JsonConvert.SerializeObject(quote)
+                    });
                 }
 
                 previousQuote = quote;
-                log.LogInformation($"No change in price: {quote.CurrentPrice}");
             }
-            log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+            log.LogInformation($"C# Timer trigger function executed at: {ts}");
         }
     }
 }
