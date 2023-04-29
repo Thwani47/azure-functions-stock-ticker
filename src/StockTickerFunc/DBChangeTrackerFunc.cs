@@ -24,7 +24,7 @@ namespace StockTickerFunc
                 await signalRMessages.AddAsync(
                     new SignalRMessage
                     {
-                        Target = "new-stock-price",
+                        Target = "newmessage",
                         Arguments = new[] { input[0] }
                     });
             }

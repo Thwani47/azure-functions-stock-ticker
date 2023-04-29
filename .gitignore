@@ -1,1 +1,10 @@
 deploy
+src/SignalRClient/.idea/
+
+src/SignalRClient/bin/
+
+src/SignalRClient/obj/
+
+src/SignalRClient/appsettings.Development.json
+
+src/SignalRClient/Folder.DotSettings.user
