@@ -1,34 +1,41 @@
 import * as signalr from "@microsoft/signalr";
 
-const URL = import.meta.env.VITE_HUB_ADDRESS ?? "https://localhost:5001/hub";
+export const getConnection = (url : string, token : string) : Connector => {
+  const connection = Connector.getInstance(url, token);
+  return connection;
+}
 
-class Connector {
+export class Connector {
   private connection: signalr.HubConnection;
-  public events: (onMessageReceived: (message : unknown) => void) => void;
+  public events: (onMessageReceived: (message: unknown) => void) => void;
   static instance: Connector;
 
-  constructor() {
+  constructor(url: string, accessToken: string) {
     this.connection = new signalr.HubConnectionBuilder()
-      .withUrl(URL, {
-        skipNegotiation : true,
-
+      .withUrl(url, {
+        accessTokenFactory: () => accessToken,
+        skipNegotiation: true,
+        transport: signalr.HttpTransportType.WebSockets
       })
       .withAutomaticReconnect()
       .build();
-    this.connection.start().catch((err) => console.log(err));
+
+    this.connection
+      .start()
+      .then(() => console.log("Connected to the signalr service"))
+      .catch((err) => console.log(err));
+
     this.events = (onMessageReceived) => {
-        this.connection.on('message', (message ) => {
-            onMessageReceived(message);
-        })
-    }
+      this.connection.on("broadcast", (message) => {
+        onMessageReceived(message);
+      });
+    };
   }
 
-  public static getInstance() : Connector {
-    if (!Connector.instance){
-        Connector.instance = new Connector();
+  public static getInstance(url : string, accessToken : string): Connector {
+    if (!Connector.instance) {
+      Connector.instance = new Connector(url, accessToken);
     }
     return Connector.instance;
   }
 }
-
-export default Connector.getInstance

@@ -15,7 +15,7 @@ namespace StockTickerFunc
             collectionName: "stockprices",
             ConnectionStringSetting = "CosmosDbConnectionString",
             CreateLeaseCollectionIfNotExists = true)]IReadOnlyList<Document> input,
-            [SignalR(HubName = "stockprices")] IAsyncCollector<SignalRMessage> signalRMessages,
+            [SignalR(HubName = "hub")] IAsyncCollector<SignalRMessage> signalRMessages,
             ILogger log)
         {
             if (input != null && input.Count > 0)
@@ -24,10 +24,11 @@ namespace StockTickerFunc
                 await signalRMessages.AddAsync(
                     new SignalRMessage
                     {
-                        Target = "newmessage",
-                        Arguments = new[] { input[0] }
+                        Target = "broadcast",
+                        Arguments = new[] { (input[0]) }
                     });
             }
+
         }
     }
 }
