@@ -31,4 +31,7 @@ az functionapp config appsettings set --name $functionAppName --resource-group $
 az signalr create --name $signalRSvc --resource-group $resourceGroup --sku "Free_F1" --unit-count 1 --service-mode "Default"
 
 $signalRSvcConnstring=$(az signalr key list --name $signalRSvc  --resource-group $resourceGroup --query primaryConnectionString -o tsv)
+$funtionAppHost=$(az functionapp show --name $signalRSvc --resource-group $resourceGroup --query 'defaultHostName' --output tsv)
 az functionapp config appsettings set --name $functionAppName --resource-group $resourceGroup --settings AzureSignalRConnectionString=$signalRSvcConnstring
+
+az webapp config appsettings set --resource-group $resourceGroup --n $appService --settings VITE_GETINFO_URL=$funtionAppHost

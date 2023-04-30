@@ -20,7 +20,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:7071/api/GetConnectionInfo") // TODO change this to url from env variables
+      .get(`${import.meta.env.VITE_GETINFO_URL}/api/GetConnectionInfo`)
       .then((data) => {
         const url = data.data.url;
         const accessToken = data.data.accessToken;
@@ -33,7 +33,6 @@ function App() {
 
   useEffect(() => {
     connection?.events((message) => {
-      console.log(message);
       const deserializedMessage = message as Quote;
       setQuoteData(deserializedMessage);
     });
